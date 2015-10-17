@@ -11,12 +11,13 @@ let projectRepo = require("./lib/repository/project")
 let clientRepo = require("./lib/repository/client")
 let taskRepo = require("./lib/repository/task")
 
-
-let args = getArguments()
-let config = readConfig(args.config)
-let harvestSource = getHarvestSource(config)
-let harvestDest = getHarvestDest(config)
-let syncActions = getSyncActions(harvestSource, harvestDest, config.sync)
+{
+    let args = getArguments()
+    let config = readConfig(args.config)
+    let harvestSource = getHarvestSource(config)
+    let harvestDest = getHarvestDest(config)
+    let syncActions = getSyncActions(harvestSource, harvestDest, config.sync)
+}
 
 /*
  * Functions
@@ -34,12 +35,13 @@ function getSyncActions(harvestSource, harvestDest, syncs) {
         let sourcePromise = getHarvestData(harvestSource, "source", sourceParts)
         let destPromise = getHarvestData(harvestDest, "dest", destParts)
 
-        Promise.all([sourcePromise, destPromise], function(values) {
-            let sourceHarvestData = values[0]
-            let destHarvestData = values[1];
+        Promise.all([sourcePromise, destPromise])
+            .then((values) => {
+                let sourceHarvestData = values[0]
+                let destHarvestData = values[1];
 
-            console.log([sourceHarvestData, destHarvestData])
-        })
+                console.log([sourceHarvestData, destHarvestData])
+            })
     }
 }
 
@@ -59,7 +61,7 @@ function getHarvestData(harvest, harvestName, syncParts) {
 
             client = thisClient
 
-            return projectRepo.getClientProjectByName(harvestSource, thisClient.id, syncParts.project)
+            return projectRepo.getClientProjectByName(harvest, thisClient.id, syncParts.project)
         })
         .catch(function(err) {
             error("Something went wrong while fetching " + harvestName + " project from Harvest: " + err)
@@ -80,7 +82,7 @@ function getHarvestData(harvest, harvestName, syncParts) {
             process.exit(7)
         })
 
-    let taskPromise = taskRepo.getTaskByName(harvestSource, syncParts.task)
+    let taskPromise = taskRepo.getTaskByName(harvest, syncParts.task)
         .catch(function(err) {
             error("Something went wrong while  fetching " + harvestName + " task from Harvest: " + err)
             process.exit(11)
@@ -100,13 +102,14 @@ function getHarvestData(harvest, harvestName, syncParts) {
             process.exit(7)
         })
 
-    Promise.all([clientProjectPromise, taskPromise], function(values) {
-        return Promise.resolve({
-            "client" : client,
-            "project" : project,
-            "task" : task
+    return Promise.all([clientProjectPromise, taskPromise])
+        .then((values) => {
+            return Promise.resolve({
+                "client" : client,
+                "project" : project,
+                "task" : task
+            })
         })
-    })
 }
 
 function analyzeConfig(config) {
