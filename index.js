@@ -145,10 +145,21 @@ function analyzeConfig(config) {
     if(!config.dest.subdomain) return "Your config must define: dest.subdomain"
     if(!config.dest.email) return "Your config must define: dest.email"
     if(!config.dest.password) return "Your config must define: dest.password"
+    if(!config.start) return "Your config must define: start"
     if(!config.sync) return "Your config must define: sync"
     if(!Object.keys(config.sync).length) return "Your config must define at least one sync item"
 
-    return analyzeSync(config.sync)
+    let startProblem = analyzeStart(config.start)
+    if(startProblem) return startProblem
+
+    let syncProblem = analyzeSync(config.sync)
+    if(syncProblem) return syncProblem
+}
+
+function analyzeStart(start) {
+    if(!start.match(/^(\d{4})-(\d{2})-(\d{2})$/)) return "'start' must be in the format: YYYY-MM-DD"
+
+    if(isNaN(Date.parse(start))) return "The start date provided is not a valid date"
 }
 
 function analyzeSync(sync) {
