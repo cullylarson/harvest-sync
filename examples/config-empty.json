@@ -1,0 +1,14 @@
+{
+  "source": {
+    "subdomain": "",
+    "email": "",
+    "password": ""
+  },
+  "dest": {
+    "subdomain": "",
+    "email": "",
+    "password": ""
+  },
+  "sync": {
+  }
+}

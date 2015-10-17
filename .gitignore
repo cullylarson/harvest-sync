@@ -1,0 +1,8 @@
+**/.DS_Store
+.idea
+.vagrant
+node_modules
+
+# test temp folder
+test/tmp/*
+!test/tmp/.gitkeep
