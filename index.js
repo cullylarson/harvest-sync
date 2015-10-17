@@ -4,12 +4,14 @@
 let Harvest = require("harvest")
 let commandLineArgs = require("command-line-args")
 let error = require("./lib/error")
+let datle = require("./lib/datle")
 let basename = require("basename")
 let jsonfile = require("jsonfile")
 let Promise = require("promise")
 let projectRepo = require("./lib/repository/project")
 let clientRepo = require("./lib/repository/client")
 let taskRepo = require("./lib/repository/task")
+let dailyRepo = require("./lib/repository/daily")
 
 {
     let args = getArguments()
