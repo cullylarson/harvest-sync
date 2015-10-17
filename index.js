@@ -24,25 +24,49 @@ let taskRepo = require("./lib/repository/task")
  */
 
 function getSyncActions(harvestSource, harvestDest, syncs) {
-    for(let key in syncs) {
-        if (!syncs.hasOwnProperty(key)) continue;
-        let source = key
-        let dest = syncs[key]
+    getAllSyncData(harvestSource, harvestDest, syncs)
+        .then((syncsData) => {
+            console.log(syncsData)//stub
+        })
+}
 
-        let sourceParts = parseSyncItem(source)
-        let destParts = parseSyncItem(dest)
+function getAllSyncData(harvestSource, harvestDest, syncs) {
+    return new Promise((resolve, reject) => {
+        let allSyncData = []
 
-        let sourcePromise = getHarvestData(harvestSource, "source", sourceParts)
-        let destPromise = getHarvestData(harvestDest, "dest", destParts)
+        let allPromises = []
 
-        Promise.all([sourcePromise, destPromise])
-            .then((values) => {
-                let sourceHarvestData = values[0]
-                let destHarvestData = values[1];
+        for(let key in syncs) {
+            if (!syncs.hasOwnProperty(key)) continue;
+            let source = key
+            let dest = syncs[key]
 
-                console.log([sourceHarvestData, destHarvestData])
+            let sourceParts = parseSyncItem(source)
+            let destParts = parseSyncItem(dest)
+
+            let sourcePromise = getHarvestData(harvestSource, "source", sourceParts)
+            let destPromise = getHarvestData(harvestDest, "dest", destParts)
+
+            let bothPromise = Promise.all([sourcePromise, destPromise])
+                .then((values) => {
+                    let sourceHarvestData = values[0]
+                    let destHarvestData = values[1];
+
+                    allSyncData.push({"source": sourceHarvestData, "dest": destHarvestData})
+                })
+
+            allPromises.push(bothPromise)
+        }
+
+        Promise.all(allPromises)
+            .then(() => {
+                resolve(allSyncData)
             })
-    }
+            .catch((err) => {
+                error("Something went wrong while talking to Harvest: " + err)
+                process.exit(13)
+            })
+    })
 }
 
 function getHarvestData(harvest, harvestName, syncParts) {
