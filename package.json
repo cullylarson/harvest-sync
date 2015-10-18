@@ -14,6 +14,7 @@
     "command-line-args": "^2.0.2",
     "harvest": "^0.1.1",
     "jsonfile": "^2.2.3",
+    "nextday": "^1.0.1",
     "promise": "^7.0.4"
   }
 }
