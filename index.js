@@ -12,7 +12,7 @@ let jsonfile = require("jsonfile")
 let Promise = require("promise")
 let syncUtil = require("./lib/sync-util")
 let harvestUtil = require("./lib/harvest-util")
-let diffPrinter = require("./lib/diff-printer")
+let actionPrinter = require("./lib/action-printer")
 let confirmActions = require("./lib/confirm-actions")
 
 {
@@ -22,7 +22,7 @@ let confirmActions = require("./lib/confirm-actions")
     let harvestDest = harvestUtil.getHarvestDest(config)
     syncUtil.getSyncActions(harvestSource, harvestDest, datle(config.start), config.sync)
         .then((actions) => {
-            diffPrinter(actions)
+            actionPrinter(actions)
 
             return confirmActions()
         })
