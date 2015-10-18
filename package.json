@@ -16,6 +16,7 @@
     "jsonfile": "^2.2.3",
     "moment": "^2.10.6",
     "nextday": "^1.0.1",
-    "promise": "^7.0.4"
+    "promise": "^7.0.4",
+    "sort-object": "^3.0.0"
   }
 }

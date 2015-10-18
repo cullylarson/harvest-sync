@@ -19,6 +19,7 @@ let clientRepo = require("./lib/repository/client")
 let taskRepo = require("./lib/repository/task")
 let dailyRepo = require("./lib/repository/daily")
 let chalk = require("chalk")
+let sortObj = require("sort-object")
 
 {
     let args = getArguments()
@@ -120,7 +121,7 @@ function getDiffsByDate(diffs) {
         })
     })
 
-    return byDate
+    return sortObj(byDate)
 }
 
 function diffDays(harvestSource, harvestDest, syncsData, startDate) {
