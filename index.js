@@ -1,10 +1,15 @@
 #!/usr/bin/env node --harmony
 "use strict"
 
+// TODO -- handle promise rejection
+// TODO -- move functions into modules
+
 let Harvest = require("harvest")
 let commandLineArgs = require("command-line-args")
 let error = require("./lib/error")
 let datle = require("./lib/datle")
+let undatle = require("./lib/undatle")
+let moment = require("moment")
 let basename = require("basename")
 let jsonfile = require("jsonfile")
 let nextday = require("nextday")
@@ -13,6 +18,7 @@ let projectRepo = require("./lib/repository/project")
 let clientRepo = require("./lib/repository/client")
 let taskRepo = require("./lib/repository/task")
 let dailyRepo = require("./lib/repository/daily")
+let chalk = require("chalk")
 
 {
     let args = getArguments()
@@ -38,8 +44,83 @@ function getSyncActions(harvestSource, harvestDest, startDate, syncs) {
             return Promise.all(allPromises)
         })
         .then((diffs) => {
-            console.log(diffs)
+            printDiffSummary(diffs)
         })
+}
+
+function hoursFloatToStr(hoursFloat) {
+    let hoursInt = Math.floor(hoursFloat)
+    let minsFloat = hoursFloat - hoursInt
+    let minsInt = Math.floor(minsFloat * 60)
+
+    return "" + hoursInt + ":" + ("0" + minsInt).slice(-2)
+}
+
+function printDiffSummary(diffs) {
+    let formatLine = (marker, detailFn, diff) => {
+        return "[" + marker + "] " + detailFn(diff.client.name + " / " + diff.project.name + " / " + diff.task.name + " (" + hoursFloatToStr(diff.time.hours) + ")")
+    }
+
+    let diffsByDate = getDiffsByDate(diffs)
+    console.log(chalk.bold("SUMMARY:"))
+    console.log(chalk.gray("==========================================================================="))
+    for(let dateStr in diffsByDate) {
+        if (!diffsByDate.hasOwnProperty(dateStr)) continue;
+        let iDiffs = diffsByDate[dateStr]
+        let iDate = datle(dateStr)
+
+        let l = []
+        l.p = l.push
+
+        l.p("")
+        l.p(chalk.cyan(moment(iDate).format("ddd MMM Do")))
+        l.p(chalk.gray("---------------------------------------------------------------------------"))
+
+        iDiffs.present.forEach((presentDiff) => {
+            l.p(formatLine(chalk.bgGreen("*"), chalk.green, presentDiff))
+        })
+
+        iDiffs.missing.forEach((missingDiff) => {
+            l.p(formatLine(chalk.bgYellow("+"), chalk.yellow, missingDiff))
+        })
+
+        l.forEach((x) => console.log(x))
+    }
+
+    console.log(chalk.gray("\n==========================================================================="))
+}
+
+function getDiffsByDate(diffs) {
+    let byDate = {}
+
+    let ensureKey = (key) => {
+        if(!byDate[key]) {
+            byDate[key] = {
+                "missing": [],
+                "present": []
+            }
+        }
+    }
+
+    diffs.forEach((diff) => {
+        if(!diff.missing.length && !diff.present.length) return
+
+        diff.missing.forEach((missingDiff) => {
+            let dateStr = undatle(missingDiff.time.date)
+            ensureKey(dateStr)
+
+            byDate[dateStr].missing.push(missingDiff)
+        })
+
+        diff.present.forEach((presentDiff) => {
+            let dateStr = undatle(presentDiff.time.date)
+            ensureKey(dateStr)
+
+            byDate[dateStr].present.push(presentDiff)
+        })
+    })
+
+    return byDate
 }
 
 function diffDays(harvestSource, harvestDest, syncsData, startDate) {
@@ -93,7 +174,7 @@ function diffTimes(sourceTimes, destTimes, sourceInfo, destInfo) {
         if(sourceTime.taskId !== sourceInfo.task.id) return
 
         // see if it's in the dest
-        let souceTimeAlreadyExistInDest = false
+        let sourceTimeAlreadyExistInDest = false
 
         for(let i = 0; i < destTimes.length; i++) {
             let destTime = destTimes[i]
@@ -106,22 +187,31 @@ function diffTimes(sourceTimes, destTimes, sourceInfo, destInfo) {
             // their hours to see if they're the same
 
             if(destTime.hours === sourceTime.hours) {
-                souceTimeAlreadyExistInDest = true
+                sourceTimeAlreadyExistInDest = true
                 break
             }
         }
 
         // we found this source time in dest
-        if(souceTimeAlreadyExistInDest) {
-            diff.present.push(sourceTime)
+        if(sourceTimeAlreadyExistInDest) {
+            diff.present.push(buildDiff(sourceTime, sourceInfo))
         }
         // we didn't find the source time in the dest
         else {
-            diff.missing.push(sourceTime)
+            diff.missing.push(buildDiff(sourceTime, sourceInfo))
         }
     })
 
     return diff
+}
+
+function buildDiff(time, info) {
+    return {
+        "time": time,
+        "client" : info.client,
+        "project" : info.project,
+        "task" : info.task
+    }
 }
 
 function getAllSyncData(harvestSource, harvestDest, syncs) {
