@@ -17,6 +17,7 @@
     "moment": "^2.10.6",
     "nextday": "^1.0.1",
     "promise": "^7.0.4",
+    "prompt": "^0.2.14",
     "sort-object": "^3.0.0"
   }
 }

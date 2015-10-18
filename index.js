@@ -13,6 +13,7 @@ let Promise = require("promise")
 let syncUtil = require("./lib/sync-util")
 let harvestUtil = require("./lib/harvest-util")
 let diffPrinter = require("./lib/diff-printer")
+let confirmActions = require("./lib/confirm-actions")
 
 {
     let args = getArguments()
@@ -22,6 +23,13 @@ let diffPrinter = require("./lib/diff-printer")
     syncUtil.getSyncActions(harvestSource, harvestDest, datle(config.start), config.sync)
         .then((actions) => {
             diffPrinter(actions)
+
+            return confirmActions()
+        })
+        .then(() => {
+            console.log("DOING STUFF, NOT REALLY")
+        }, () => {
+            console.log("FINE, DOING NOTHING, REALLY")
         })
 }
 
