@@ -7,6 +7,7 @@ let error = require("./lib/error")
 let datle = require("./lib/datle")
 let basename = require("basename")
 let jsonfile = require("jsonfile")
+let nextday = require("nextday")
 let Promise = require("promise")
 let projectRepo = require("./lib/repository/project")
 let clientRepo = require("./lib/repository/client")
@@ -18,18 +19,109 @@ let dailyRepo = require("./lib/repository/daily")
     let config = readConfig(args.config)
     let harvestSource = getHarvestSource(config)
     let harvestDest = getHarvestDest(config)
-    let syncActions = getSyncActions(harvestSource, harvestDest, config.sync)
+    let syncActions = getSyncActions(harvestSource, harvestDest, datle(config.start), config.sync)
 }
 
 /*
  * Functions
  */
 
-function getSyncActions(harvestSource, harvestDest, syncs) {
+function getSyncActions(harvestSource, harvestDest, startDate, syncs) {
     getAllSyncData(harvestSource, harvestDest, syncs)
         .then((syncsData) => {
-            console.log(syncsData)//stub
+            let allPromises = []
+
+            syncsData.forEach((sync) => {
+                allPromises.push(diffDays(harvestSource, harvestDest, sync, startDate))
+            })
+
+            return Promise.all(allPromises)
         })
+        .then((diffs) => {
+            console.log(diffs)
+        })
+}
+
+function diffDays(harvestSource, harvestDest, syncsData, startDate) {
+    return new Promise((resolve, reject) => {
+        let allPromises = []
+
+        let current = new Date(startDate.getTime())
+        let endTime = new Date().getTime()
+
+        while(current.getTime() <= endTime) {
+            let sourcePromise = dailyRepo.getDayTimes(harvestSource, current)
+            let destPromise = dailyRepo.getDayTimes(harvestDest, current)
+
+            current = nextday(current)
+
+            let bothPromise = Promise.all([sourcePromise, destPromise])
+                .then((values) => {
+                    let sourceTimes = values[0]
+                    let destTimes = values[1];
+
+                    let diff = diffTimes(sourceTimes, destTimes, syncsData.source, syncsData.dest)
+
+                    return Promise.resolve(diff)
+                })
+
+            allPromises.push(bothPromise)
+        }
+
+        Promise.all(allPromises)
+            .then((diffs) => {
+                resolve(diffs.reduce((allDiffs, diff) => {
+                    return {
+                        "missing": allDiffs.missing.concat(diff.missing),
+                        "present": allDiffs.present.concat(diff.present),
+                    }
+                }, {"missing": [], "present": []}))
+            })
+    })
+}
+
+function diffTimes(sourceTimes, destTimes, sourceInfo, destInfo) {
+    let diff = {
+        "missing": [],
+        "present": [],
+    }
+
+    // find the source items that aren't in the dest
+    sourceTimes.forEach((sourceTime) => {
+        // if we aren't looking for this time
+        if(sourceTime.projectId !== sourceInfo.project.id) return
+        if(sourceTime.taskId !== sourceInfo.task.id) return
+
+        // see if it's in the dest
+        let souceTimeAlreadyExistInDest = false
+
+        for(let i = 0; i < destTimes.length; i++) {
+            let destTime = destTimes[i]
+            // if we aren't looking for this time
+            if(destTime.projectId !== destInfo.project.id) continue
+            if(destTime.taskId !== destInfo.task.id) continue
+
+            // at this point, we know we have a source time we're looking for
+            // and a dest time we're looking for.  all that's left is to compare
+            // their hours to see if they're the same
+
+            if(destTime.hours === sourceTime.hours) {
+                souceTimeAlreadyExistInDest = true
+                break
+            }
+        }
+
+        // we found this source time in dest
+        if(souceTimeAlreadyExistInDest) {
+            diff.present.push(sourceTime)
+        }
+        // we didn't find the source time in the dest
+        else {
+            diff.missing.push(sourceTime)
+        }
+    })
+
+    return diff
 }
 
 function getAllSyncData(harvestSource, harvestDest, syncs) {
