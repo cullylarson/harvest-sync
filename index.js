@@ -133,7 +133,6 @@ function getArguments() {
         [
             { name: "config", type: String, multiple: false, defaultOption: true },
             { name: "help", alias: "h", type: Boolean, defaultValue: false },
-            { name: "dry-run", type: Boolean, defaultValue: false },
         ]
     )
 
