@@ -1,7 +1,7 @@
 {
   "name": "harvest-sync",
   "version": "0.1.0",
-  "description": "Syncs timesheets between two Harvest accounts.",
+  "description": "Syncs time-sheets between two Harvest accounts.",
   "author": {
     "name": "Cully Larson",
     "email": "cully.larson@gmail.com"

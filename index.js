@@ -163,7 +163,7 @@ function getArguments() {
 
     let cliUsage = cli.getUsage({
         title: "harvest-sync",
-        description: "Syncs timesheets between two harvest accounts.",
+        description: "Syncs time-sheets between two harvest accounts.",
         footer: "Project Home: [underline]{https://github.com/cullylarson/harvest-sync}",
         synopsis: [
             "$ " + me + " path/to/your-config-file.json",
