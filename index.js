@@ -2,7 +2,6 @@
 "use strict"
 
 // TODO -- handle promise rejection
-// TODO -- move functions into modules
 
 let commandLineArgs = require("command-line-args")
 let error = require("./lib/error")
