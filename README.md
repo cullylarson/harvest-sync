@@ -46,6 +46,9 @@ $ npm install -g harvest-sync
 $ harvest-sync path/to/config-file.json
 ```
 
+NOTE: `harvest-sync` will ask you to confirm before actually doing anything,
+so you can run it without making any changes to your Harvest time-sheets.
+
 ## Config
 
 Configuration is done using a .json file that is passed to the `harvest-sync` command.
