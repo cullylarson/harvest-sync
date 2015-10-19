@@ -105,7 +105,7 @@ you can escape it as "//". So, for example: "Client // Name / Project Name / Tas
 }
 ```
 
-This would do the follow, for each sync defined:
+This would do the following, for each sync defined:
 
 1. Find all timesheets on the source with `Source Client Name 1 / Source Project Name 1
 / Source Task Name 1`
