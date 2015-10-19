@@ -50,6 +50,19 @@ NOTE: `harvest-sync` will show you what it plans to do and ask you to confirm
 before actually doing anything, so you can run it without making any changes
 to your Harvest time-sheets.
 
+### Listing Clients, Project, and Tasks
+
+There's a sub-command that allows you to list details about a Harvest account.
+Just provide the config .json file as normal, and also pass the --list parameter.
+This parameter is of the form: `(source|dest).(clients|projects|tasks)`.
+
+For example:
+
+```
+$ harvest-sync --list dest.clients path/to/config-file.json
+$ harvest-sync --list source.tasks path/to/config-file.json
+```
+
 ### Generate a Config File
 
 There's a sub-command that allows you to generate a config file by answering
