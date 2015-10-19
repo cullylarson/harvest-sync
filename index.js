@@ -38,7 +38,7 @@ function getArguments() {
 
     let cli = commandLineArgs(
         [
-            { name: "bare", type: String, multiple: true, defaultOption: true },
+            { name: "sync", type: String, multiple: true, defaultOption: true },
             { name: "help", alias: "h", type: Boolean, defaultValue: false },
         ]
     )
@@ -68,6 +68,8 @@ function parseBareParams(args, cliUsage) {
     ]
 
     let defaultSubCommand = 'sync'
+
+    if(args.sync) args.bare = args.sync
 
     // parse the bare params
     if(args.bare) {
