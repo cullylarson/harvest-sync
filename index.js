@@ -34,10 +34,10 @@ function verifyArguments(args, cliUsage) {
         process.exit(1)
     }
 
-    verifyListArg(args)
+    verifyListArg(args, cliUsage)
 }
 
-function verifyListArg(args) {
+function verifyListArg(args, cliUsage) {
     let validListArgs = [
         "source.clients",
         "source.projects",
