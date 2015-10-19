@@ -6,11 +6,13 @@ let error = require("./lib/error")
 let basename = require("basename")
 
 let subcommandSync = require("./lib/subcommands/sync")
+let subcommandConfig = require("./lib/subcommands/config")
 
 {
     let args = getArguments()
 
-    if(args.subcommand === 'sync') subcommandSync(args.config)
+    if(args.subcommand === 'sync')        subcommandSync(args.config)
+    else if(args.subcommand === 'config') subcommandConfig()
 }
 
 /*
