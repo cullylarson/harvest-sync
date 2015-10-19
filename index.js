@@ -7,12 +7,14 @@ let basename = require("basename")
 
 let subcommandSync = require("./lib/subcommands/sync")
 let subcommandConfig = require("./lib/subcommands/config")
+let subcommandList = require("./lib/subcommands/list")
 
 {
     let args = getArguments()
 
-    if(args.subcommand === 'sync')        subcommandSync(args.config)
-    else if(args.subcommand === 'config') subcommandConfig()
+    if(args.subcommand === 'sync' && args.list) subcommandList(args.list, args.config)
+    else if(args.subcommand === 'sync')         subcommandSync(args.config)
+    else if(args.subcommand === 'config')       subcommandConfig()
 }
 
 /*
@@ -31,6 +33,24 @@ function verifyArguments(args, cliUsage) {
         console.log(cliUsage)
         process.exit(1)
     }
+
+    verifyListArg(args)
+}
+
+function verifyListArg(args) {
+    let validListArgs = [
+        "source.clients",
+        "source.projects",
+        "source.tasks",
+        "dest.clients",
+        "dest.projects",
+        "dest.tasks",
+    ]
+
+    if(args.list && validListArgs.indexOf(args.list) === -1) {
+        console.log(cliUsage)
+        process.exit(21)
+    }
 }
 
 function getArguments() {
@@ -39,6 +59,7 @@ function getArguments() {
     let cli = commandLineArgs(
         [
             { name: "sync", type: String, multiple: true, defaultOption: true },
+            { name: "list", type: String, multiple: false },
             { name: "help", alias: "h", type: Boolean, defaultValue: false },
         ]
     )
@@ -49,6 +70,7 @@ function getArguments() {
         footer: "Project Home: [underline]{https://github.com/cullylarson/harvest-sync}",
         synopsis: [
             "$ " + me + " path/to/your-config-file.json",
+            "$ " + me + " --list (source|dest).(clients|projects|tasks) path/to/your-config-file.json",
             "$ " + me + " [bold]{--help}",
             "$ " + me + " config"
         ],
