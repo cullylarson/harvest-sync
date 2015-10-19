@@ -10,17 +10,18 @@ let datle = require("./lib/datle")
 let basename = require("basename")
 let jsonfile = require("jsonfile")
 let Promise = require("promise")
-let syncUtil = require("./lib/sync-util")
+let actionUtil = require("./lib/action-util")
 let harvestUtil = require("./lib/harvest-util")
 let actionPrinter = require("./lib/action-printer")
 let confirmActions = require("./lib/confirm-actions")
+let chalk = require("chalk")
 
 {
     let args = getArguments()
     let config = readConfig(args.config)
     let harvestSource = harvestUtil.getHarvestSource(config)
     let harvestDest = harvestUtil.getHarvestDest(config)
-    syncUtil.getSyncActions(harvestSource, harvestDest, datle(config.start), config.sync)
+    actionUtil.getSyncActions(harvestSource, harvestDest, datle(config.start), config.sync)
         .then((actions) => {
             actionPrinter(actions)
 
@@ -29,7 +30,7 @@ let confirmActions = require("./lib/confirm-actions")
         .then(() => {
             console.log("DOING STUFF, NOT REALLY")
         }, () => {
-            console.log("FINE, DOING NOTHING, REALLY")
+            console.log(chalk.bold("Exiting without performing actions."))
         })
 }
 
@@ -77,8 +78,8 @@ function analyzeSync(sync) {
         let source = key
         let dest = sync[key]
 
-        let sourceParts = syncUtil.parseSyncItem(source)
-        let destParts = syncUtil.parseSyncItem(dest)
+        let sourceParts = actionUtil.parseSyncItem(source)
+        let destParts = actionUtil.parseSyncItem(dest)
 
         let sourceProblem = analyzeParts("Source", source, sourceParts)
         if(sourceProblem) return sourceProblem
