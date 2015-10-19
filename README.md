@@ -27,7 +27,7 @@ So, for example:
 | **Task**     | Source Task Name     | Dest Task Name    |
 | **Date**     | 2015-10-18           | 2015-10-18        |
 | **Hours**    | 3:15                 | 3:15              |
-| **Notes**    | A simple note.       | A simple notes.   |
+| **Notes**    | A simple note.       | A simple note.    |
 
 
 ## Install
