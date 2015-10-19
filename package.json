@@ -2,12 +2,23 @@
   "name": "harvest-sync",
   "version": "0.1.0",
   "description": "Syncs timesheets between two Harvest accounts.",
-  "author": "Cully Larson",
+  "author": {
+    "name": "Cully Larson",
+    "email": "cully.larson@gmail.com"
+  },
   "license": "MIT",
   "preferGlobal": true,
   "bin": {
     "harvest-sync": "index.js"
   },
+  "keywords": [
+    "harvest",
+    "time",
+    "timesheet",
+    "timer",
+    "sync",
+    "send"
+  ],
   "dependencies": {
     "basename": "^0.1.2",
     "chalk": "^1.1.1",
