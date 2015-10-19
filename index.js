@@ -49,7 +49,8 @@ function getArguments() {
         footer: "Project Home: [underline]{https://github.com/cullylarson/harvest-sync}",
         synopsis: [
             "$ " + me + " path/to/your-config-file.json",
-            "$ " + me + " [bold]{--help}"
+            "$ " + me + " [bold]{--help}",
+            "$ " + me + " config"
         ],
     })
 
@@ -95,6 +96,9 @@ function parseBareParams(args, cliUsage) {
                 }
             }
         }
+    }
+    else {
+        args.subcommand = defaultSubCommand
     }
 
     return args

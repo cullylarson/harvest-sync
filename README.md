@@ -46,8 +46,18 @@ $ npm install -g harvest-sync
 $ harvest-sync path/to/config-file.json
 ```
 
-NOTE: `harvest-sync` will ask you to confirm before actually doing anything,
-so you can run it without making any changes to your Harvest time-sheets.
+NOTE: `harvest-sync` will show you what it plans to do and ask you to confirm
+before actually doing anything, so you can run it without making any changes
+to your Harvest time-sheets.
+
+### Generate a Config File
+
+There's a sub-command that allows you to generate a config file by answering
+some questions:
+
+```
+$ harvest-sync config
+```
 
 ## Config
 
@@ -109,7 +119,6 @@ task values, and their dates and hours are the same.
 1. If any are found on the source account, but not on the destination, they will be
 copied from the source to the destination, under `Dest Client Name 1 / Dest Project
 Name 1 / Dest Task Name 1`, but with the same date, hours, and notes.
-
 
 ## License
 
