@@ -98,7 +98,7 @@ function analyzeSync(sync) {
     }
 
     for(let key in sync) {
-        if(!sync.hasOwnProperty(key)) continue;
+        if(!sync.hasOwnProperty(key)) continue
 
         let source = key
         let dest = sync[key]
