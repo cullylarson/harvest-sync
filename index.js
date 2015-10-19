@@ -21,16 +21,42 @@ let chalk = require("chalk")
     let config = readConfig(args.config)
     let harvestSource = harvestUtil.getHarvestSource(config)
     let harvestDest = harvestUtil.getHarvestDest(config)
+
     actionUtil.getSyncActions(harvestSource, harvestDest, datle(config.start), config.sync)
         .then((actions) => {
-            actionPrinter(actions)
+            actionPrinter.summary(actions)
 
-            return confirmActions()
+            // no actions to perform
+            if(!actions.missing.length) {
+                console.log(chalk.bold.cyan("Everything is already synced. No actions to perform.\n"))
+                process.exit(0)
+            }
+            // confirm performance of actions
+            else {
+                return confirmActions(actions)
+            }
         })
-        .then(() => {
-            console.log("DOING STUFF, NOT REALLY")
+        .then((actions) => {
+            return actionUtil.performSyncActions(harvestDest, actions.missing)
         }, () => {
-            console.log(chalk.bold("Exiting without performing actions."))
+            console.log(chalk.bold.cyan("Exiting without performing sync.\n"))
+            process.exit(0)
+        })
+        .then((results) => {
+            // no actions performed
+            if(!results.success.length && !results.failure.length) {
+                console.log(chalk.bold.yellow("No changes were made.\n"))
+                process.exit(0)
+            }
+            // all successful
+            else if(!results.failure.length) {
+                console.log(chalk.bold.green("All times were sent to the destination successfully.\n"))
+                process.exit(0)
+            }
+            // else, some failure
+            else {
+                actionPrinter.failure({"missing": results.failure, "present": []})
+            }
         })
 }
 
