@@ -6,6 +6,7 @@
     "name": "Cully Larson",
     "email": "cully.larson@gmail.com"
   },
+  "repository": "cullylarson/harvest-sync",
   "license": "MIT",
   "preferGlobal": true,
   "bin": {
