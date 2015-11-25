@@ -101,12 +101,12 @@ you can escape it as "//". So, for example: "Client // Name / Project Name / Tas
 ```
 {
   "source": {
-    "subdomain": "mydomain.harvestapp.com",
+    "subdomain": "mysubdomain",
     "email": "me@example.com",
     "password": "asdf"
   },
   "dest": {
-    "subdomain": "anotherdomain.harvestapp.com",
+    "subdomain": "anothersubdomain",
     "email": "company@example.com",
     "password": "qwer"
   },
@@ -117,6 +117,8 @@ you can escape it as "//". So, for example: "Client // Name / Project Name / Tas
   }
 }
 ```
+
+_NOTE: Do not include the '.harvestapp.com' portion of the subdomain._
 
 This would do the following, for each sync defined:
 
